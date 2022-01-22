@@ -1,2 +1,3 @@
-# ansible-collection-oci
-For working with Ansible on OCI.
+# Ansible Collection - krilor.oci
+
+Handy stuff for working with Oracle Cloud Infrastructure (OCI)

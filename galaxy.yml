@@ -1,0 +1,20 @@
+---
+namespace: krilor
+name: oci
+version: 0.0.0
+readme: README.md
+authors:
+  - Kristoffer Lorentsen
+description: Collection for working with Oracle Cloud Infrastructure
+license_file: LICENSE
+
+tags:
+ - oci
+ - oracle
+ - cloud
+
+repository: https://github.com/krilor/ansible-collection-oci
+documentation: https://github.com/krilor/ansible-collection-oci/blob/main/README.md
+homepage: https://github.com/krilor/ansible-collection-oci
+issues: https://github.com/krilor/ansible-collection-oci/issues
+build_ignore: []
