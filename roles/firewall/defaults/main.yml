@@ -1,0 +1,9 @@
+---
+# defaults file for firewall
+
+# allowed ports
+firewall_allowed_tcp_ports: []
+firewall_allowed_udp_ports: []
+
+# users allowed to access the metadata service (e.g. instance principal certificates)
+firewall_allowed_metadata_users: []

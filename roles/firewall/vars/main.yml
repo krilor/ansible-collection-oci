@@ -1,0 +1,20 @@
+---
+# vars file for firewall
+
+# The OCI config file
+_firewall_ruleset_dir: /etc/nftables
+_firewall_ruleset_file: oci.nft
+_firewall_ruleset_file_path: "{{ _firewall_ruleset_dir }}/{{ _firewall_ruleset_file }}"
+
+# Systemd service config file
+_firewall_service_ruleset_path: /etc/sysconfig/nftables.conf
+
+
+# These ports are allowed as default by the role.
+_firewall_allowed_tcp_ports:
+  - 22
+
+# Users allowed to access the metadata service
+_firewall_allowed_metadata_users:
+  - root
+  - oracle-cloud-agent

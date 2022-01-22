@@ -1,0 +1,44 @@
+- name: stop, disable and mask firewalld
+  ansible.builtin.systemd:
+    name: firewalld
+    state: stopped
+    enabled: false
+    masked: true
+
+- name: make sure nftables is installed
+  ansible.builtin.package:
+    name: nftables
+    state: present
+
+- name: flush nftables and iptables first time around
+  ansible.builtin.shell:
+    cmd: >
+      /sbin/iptables --table nat --flush || true;
+      /sbin/iptables --table mangle --flush || true;
+      /sbin/iptables --flush || true;
+      /sbin/iptables --delete-chain || true;
+      /sbin/ip6tables --flush || true;
+      /sbin/ip6tables --delete-chain || true;
+      /sbin/nft flush ruleset || true;
+      /sbin/nft add table inet firewall || true;
+    creates: "{{ _firewall_ruleset_file_path }}"
+
+- name: template config files
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0600
+    validate: /sbin/nft --check --file %s
+  notify: reload nftables
+  loop:
+    - { src: ruleset.j2.nft, dest: "{{ _firewall_ruleset_file_path }}"}
+    - { src: nftables.j2.conf, dest: "{{ _firewall_service_ruleset_path }}"}
+
+- name: unmask, start and enable nftables
+  ansible.builtin.systemd:
+    name: nftables
+    state: started
+    enabled: true
+    masked: false

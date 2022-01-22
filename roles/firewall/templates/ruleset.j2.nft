@@ -1,0 +1,97 @@
+#!/sbin/nft -f
+# {{ ansible_managed }}
+
+table inet firewall
+flush table inet firewall
+delete table inet firewall
+
+table inet firewall {
+
+    chain input_ip {
+        # Uncomment to accept ping (icmp-echo-request) for diagnostic purposes.
+        # However, it also lets probes discover this host is alive.
+        # This sample accepts them within a certain rate limit:
+        #
+        # icmp type echo-request limit rate 5/second accept
+    }
+
+    chain input_ip6 {
+        # Accept neighbour discovery otherwise connectivity breaks
+        #
+        icmpv6 type { nd-neighbor-solicit, nd-router-advert, nd-neighbor-advert } accept
+
+        # Uncomment to accept ping (icmpv6-echo-request) for diagnostic purposes.
+        # However, it also lets probes discover this host is alive.
+        # This sample accepts them within a certain rate limit:
+        #
+        # icmpv6 type echo-request limit rate 5/second accept
+    }
+
+    chain input {
+        # By default, drop all traffic unless it meets a filter
+        # criteria specified by the rules that follow below.
+        type filter hook input priority 0; policy drop;
+
+        # Allow traffic from established and related packets, drop invalid
+        ct state vmap { established : accept, related : accept, invalid : drop }
+
+        # Allow loopback traffic.
+        iifname lo accept
+
+        # Jump to chain according to layer 3 protocol using a verdict map
+        meta protocol vmap { ip : jump input_ip, ip6 : jump input_ip6 }
+
+        # Allowed ports
+        tcp dport { {{ firewall_allowed_tcp_ports | union(_firewall_allowed_tcp_ports) | join(', ') }} } accept
+        {% if firewall_allowed_udp_ports | length > 0 %}
+        udp dport { {{ firewall_allowed_udp_ports | join(', ') }} } accept
+        {% endif %}
+
+        # Uncomment to enable logging of denied INPUT traffic
+        # log prefix "[nftables] INPUT Denied: " counter drop
+    }
+
+    chain forward {
+        # Drop everything
+        type filter hook forward priority 0; policy drop;
+    }
+
+    chain output {
+        type filter hook output priority 0; policy accept;
+        ip daddr 169.254.0.0/16 counter packets 9 bytes 794 jump oci
+    }
+
+    # Users allowed to access metadata service
+    set metadata_uids {
+        type uid
+        elements = { {{ firewall_allowed_metadata_users | union(_firewall_allowed_metadata_users) | join(', ') }} }
+    }
+
+    chain oci {
+
+        # iSCSI
+        ip daddr 169.254.0.2 skuid root tcp dport 3260  counter packets 0 bytes 0 accept
+        ip daddr 169.254.2.0/24 skuid root tcp dport 3260  counter packets 0 bytes 0 accept
+        ip daddr 169.254.4.0/24 skuid root tcp dport 3260  counter packets 0 bytes 0 accept
+        ip daddr 169.254.5.0/24 skuid root tcp dport 3260  counter packets 0 bytes 0 accept
+        ip daddr 169.254.0.2 tcp dport 80  counter packets 0 bytes 0 accept
+        ip daddr 169.254.0.3 skuid root tcp dport 80  counter packets 0 bytes 0 accept
+        ip daddr 169.254.0.4 tcp dport 80  counter packets 0 bytes 0 accept
+        # DNS
+        ip daddr 169.254.169.254 tcp dport 53  counter packets 0 bytes 0 accept
+        # Metadata service
+        ip daddr 169.254.169.254 skuid @metadata_uids tcp dport 80  counter packets 5 bytes 410 accept
+        # NTP
+        ip daddr 169.254.169.254 udp dport 123  counter packets 0 bytes 0 accept
+        # DNS
+        ip daddr 169.254.169.254 udp dport 53  counter packets 4 bytes 384 accept
+        # DHCP
+        ip daddr 169.254.169.254 udp dport 67  counter packets 0 bytes 0 accept
+        # TFTP?
+        ip daddr 169.254.169.254 udp dport 69  counter packets 0 bytes 0 accept
+        # Reject everything else
+        meta l4proto tcp ip daddr 169.254.0.0/16   counter packets 0 bytes 0 reject with tcp reset
+        meta l4proto udp ip daddr 169.254.0.0/16   counter packets 0 bytes 0 reject
+    }
+
+}

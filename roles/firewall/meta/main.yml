@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  author: Kristoffer Lorentsen
+  description: Configure firewall using nftables
+  company: me
+  issue_tracker_url: https://github.com/krilor/ansible-collection-oci/issues
+  license: GPL-3.0-or-later
+
+  min_ansible_version: 5
+
+
+  platforms:
+    - name: Oracle Linux
+      versions:
+        - 7
+        - 8
+  galaxy_tags: ["firewall", "nftables", "oracle", "cloud", "oci"]
+  dependencies: []
