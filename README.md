@@ -7,7 +7,7 @@ The content is tailored to the OCI environment.
 
 ## Links
 
-* [github.com/krilor/ansible-role-firewall](https://github.com/krilor/ansible-collection-oci)
+* [github.com/krilor/ansible-collection-oci](https://github.com/krilor/ansible-collection-oci)
 * [galaxy.ansible.com/krilor/oci](https://galaxy.ansible.com/krilor/oci)
 
 ## Roles
