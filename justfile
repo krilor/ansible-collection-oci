@@ -5,4 +5,5 @@ clean:
   rm *.tar.gz
 
 lint:
+  ansible-lint roles/*
   yamllint .
