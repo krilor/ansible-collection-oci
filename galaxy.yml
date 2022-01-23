@@ -20,3 +20,4 @@ issues: https://github.com/krilor/ansible-collection-oci/issues
 build_ignore:
   - .*
   - justfile
+  - DEVELOPMENT.md

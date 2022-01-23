@@ -3,3 +3,6 @@ build:
 
 clean:
   rm *.tar.gz
+
+lint:
+  yamllint .
