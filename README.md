@@ -5,6 +5,6 @@ Handy stuff for working with Oracle Cloud Infrastructure (OCI)
 TODO
 ----
 
-* linting
+* Linting
 * CI
-* release
+* Release
