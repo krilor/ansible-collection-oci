@@ -25,6 +25,17 @@ jobs:
         run: |
           sed -i 's/version:.*/version: ${{ steps.tag.outputs.new_tag }}/' galaxy.yml
 
+      - name: set up Python 3.
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: install Ansible.i
+        run: pip3 install ansible-core
+
+      - name: build collection
+        run: ansible-galaxy collection build
+
       - name: commit changes and push tag
         uses: EndBug/add-and-commit@v8
         with:
@@ -34,3 +45,9 @@ jobs:
           add: galaxy.yml
           tag: v${{ steps.tag.outputs.new_tag }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: publish collection to galaxy
+        run: >-
+          ansible-galaxy collection publish
+          krilor-oci-v${{ steps.tag.outputs.new_tag }}.tar.gz
+          --api-key ${{ secrets.GALAXY_API_KEY }}
