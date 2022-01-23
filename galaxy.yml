@@ -17,4 +17,6 @@ repository: https://github.com/krilor/ansible-collection-oci
 documentation: https://github.com/krilor/ansible-collection-oci/blob/main/README.md
 homepage: https://github.com/krilor/ansible-collection-oci
 issues: https://github.com/krilor/ansible-collection-oci/issues
-build_ignore: []
+build_ignore:
+  - .*
+  - justfile
