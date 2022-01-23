@@ -1,0 +1,36 @@
+---
+name: release
+on:
+  push:
+    branches:
+      - master
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+
+      - name: figure out new tag
+        id: tag
+        uses: anothrNick/github-tag-action@1.36.0
+        env:
+          WITH_V: true
+          DRY_RUN: true # just want the version
+          DEFAULT_BUMP: none
+
+      - name: update galaxy.yml version
+        run: |
+          sed -i 's/version:.*/version: ${{ steps.tag.new_tag }}/' galaxy.yml
+
+      - name: commit changes and push tag
+        uses: EndBug/add-and-commit@v8
+        with:
+          author_name: GitHub Actions
+          author_email: mail@example.com
+          message: "[github action] releasing version ${{ steps.tag.new_tag }}"
+          add: galaxy.yml
+          tag: ${{ steps.tag.new_tag }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
