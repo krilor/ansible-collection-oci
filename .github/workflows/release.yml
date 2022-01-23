@@ -24,23 +24,28 @@ jobs:
       - name: update galaxy.yml version
         run: |
           sed -i 's/version:.*/version: ${{ steps.tag.outputs.new_tag }}/' galaxy.yml
+        if: ${{ steps.tag.outputs.new_tag != steps.tag.outputs.tag }}
 
       - name: set up Python 3.
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
+        if: ${{ steps.tag.outputs.new_tag != steps.tag.outputs.tag }}
 
       - name: install Ansible.i
         run: pip3 install ansible-core
+        if: ${{ steps.tag.outputs.new_tag != steps.tag.outputs.tag }}
 
       - name: build collection
         run: ansible-galaxy collection build
+        if: ${{ steps.tag.outputs.new_tag != steps.tag.outputs.tag }}
 
       - name: publish collection to galaxy
         run: >-
           ansible-galaxy collection publish
           krilor-oci-${{ steps.tag.outputs.new_tag }}.tar.gz
           --api-key ${{ secrets.GALAXY_API_KEY }}
+        if: ${{ steps.tag.outputs.new_tag != steps.tag.outputs.tag }}
 
       - name: commit changes and push tag
         uses: EndBug/add-and-commit@v8
@@ -51,3 +56,4 @@ jobs:
           add: galaxy.yml
           tag: v${{ steps.tag.outputs.new_tag }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ steps.tag.outputs.new_tag != steps.tag.outputs.tag }}
