@@ -36,6 +36,12 @@ jobs:
       - name: build collection
         run: ansible-galaxy collection build
 
+      - name: publish collection to galaxy
+        run: >-
+          ansible-galaxy collection publish
+          krilor-oci-${{ steps.tag.outputs.new_tag }}.tar.gz
+          --api-key ${{ secrets.GALAXY_API_KEY }}
+
       - name: commit changes and push tag
         uses: EndBug/add-and-commit@v8
         with:
@@ -45,9 +51,3 @@ jobs:
           add: galaxy.yml
           tag: v${{ steps.tag.outputs.new_tag }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: publish collection to galaxy
-        run: >-
-          ansible-galaxy collection publish
-          krilor-oci-v${{ steps.tag.outputs.new_tag }}.tar.gz
-          --api-key ${{ secrets.GALAXY_API_KEY }}
