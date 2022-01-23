@@ -9,9 +9,9 @@ description: Collection for working with Oracle Cloud Infrastructure
 license_file: LICENSE
 
 tags:
- - oci
- - oracle
- - cloud
+  - oci
+  - oracle
+  - cloud
 
 repository: https://github.com/krilor/ansible-collection-oci
 documentation: https://github.com/krilor/ansible-collection-oci/blob/main/README.md
